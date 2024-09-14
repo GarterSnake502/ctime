@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruising Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        label, select, button, #timer-display, #high-scores {
+            margin: 10px 0;
+        }
+
+        select, button {
+            font-size: 1.2em;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #timer-display {
+            font-size: 2em;
+            margin-top: 20px;
+        }
+
+        #high-scores {
+            width: 90%;
+            max-width: 400px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            select, button {
+                font-size: 1.5em;
+                padding: 15px;
+            }
+
+            #timer-display {
+                font-size: 1.5em;
+            }
+
+            #high-scores {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Cruising Timer</h1>
+    <label for="book-select">Select Book:</label>
+    <select id="book-select">
+        <option value="Romans">Romans</option>
+        <option value="James">James</option>
+    </select>
+    <label for="chapter-select">Select Chapter:</label>
+    <select id="chapter-select"></select>
+    <button id="start-stop-btn">Start</button>
+    <div id="timer-display">0.00</div>
+    <div id="high-scores"></div>
+
+    <script>
+
+        const chapters = {
+            Romans: 16,
+            James: 5
+        };
+
+        function updateChapterOptions() {
+            const book = document.getElementById('book-select').value;
+            const chapterSelect = document.getElementById('chapter-select');
+            chapterSelect.innerHTML = '';
+            for (let i = 1; i <= chapters[book]; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Chapter ${i}`;
+                chapterSelect.appendChild(option);
+            }
+        }
+
+        document.getElementById('book-select').addEventListener('change', updateChapterOptions);
+        window.onload = updateChapterOptions;
+
+        let timer;
+        let startTime;
+        let running = false;
+
+        document.getElementById('start-stop-btn').addEventListener('click', function() {
+            if (running) {
+                clearInterval(timer);
+                running = false;
+                this.textContent = 'Start';
+                const elapsedTime = (Date.now() - startTime) / 1000;
+                const book = document.getElementById('book-select').value;
+                const chapter = document.getElementById('chapter-select').value;
+                updateHighScore(book, chapter, elapsedTime);
+            } else {
+                startTime = Date.now();
+                timer = setInterval(updateTimer, 100);
+                running = true;
+                this.textContent = 'Stop';
+            }
+        });
+
+        function updateTimer() {
+            const elapsedTime = (Date.now() - startTime) / 1000;
+            document.getElementById('timer-display').textContent = elapsedTime.toFixed(2);
+        }
+
+        function updateHighScore(book, chapter, time) {
+            const highScores = getHighScores();
+            const key = `${book}-${chapter}`;
+            if (!highScores[key] || time < highScores[key]) {
+                highScores[key] = time;
+                document.cookie = `highScores=${JSON.stringify(highScores)}; path=/`;
+            }
+            displayHighScores();
+        }
+
+        function getHighScores() {
+            const cookies = document.cookie.split('; ');
+            const highScoreCookie = cookies.find(cookie => cookie.startsWith('highScores='));
+            if (highScoreCookie) {
+                return JSON.parse(highScoreCookie.split('=')[1]);
+            }
+            return {};
+        }
+
+        function displayHighScores() {
+            const highScores = getHighScores();
+            const highScoresDiv = document.getElementById('high-scores');
+            highScoresDiv.innerHTML = '<h2>High Scores</h2>';
+            for (const key in highScores) {
+                const [book, chapter] = key.split('-');
+                highScoresDiv.innerHTML += `<p>${book} Chapter ${chapter}: <a href="#" onclick="deleteHighScore('${key}')">${highScores[key].toFixed(2)} seconds</a></p>`;
+            }
+        }
+
+        function deleteHighScore(key) {
+            const highScores = getHighScores();
+            delete highScores[key];
+            document.cookie = `highScores=${JSON.stringify(highScores)}; path=/`;
+            displayHighScores();
+        }
+
+        window.onload = displayHighScores;
+        updateChapterOptions(); // so that you can select a chapter without having to select James first
+
+    </script>
+</body>
+</html>
