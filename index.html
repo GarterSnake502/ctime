@@ -78,17 +78,26 @@
     </style>
 </head>
 <body>
+
     <h1>Cruising Timer</h1>
+
     <label for="book-select">Select Book:</label>
+
     <select id="book-select">
         <option value="Romans">Romans</option>
         <option value="James">James</option>
         <option value="Month">Month</option> <!-- for mass cruising -->
         <option value="Everything">Everything</option>
     </select>
+
     <label for="chapter-select">Select Chapter:</label>
     <select id="chapter-select"></select>
-    <button id="start-stop-btn">Start</button>
+
+    <div style="display: flex;">
+        <button id="start-stop-btn" style="margin-right: 5px;">Start</button>
+        <button id="save-btn" disabled>Save</button>
+    </div>
+
     <div id="timer-display">0.00</div>
     <div id="high-scores"></div>
 
@@ -122,24 +131,25 @@
         let startTime;
         let running = false;
 
+        let elapsedTime = 0; // only updates when you click STOP
+
         // Event listener for start/stop button
         document.getElementById('start-stop-btn').addEventListener('click', function() {
+
+            document.getElementById('save-btn').setAttribute("disabled", "") // make it so you can't save while running--empty string means true
+
             if (running) {
                 clearInterval(timer);
                 running = false;
                 this.textContent = 'Start';
-                const elapsedTime = (Date.now() - startTime) / 1000;
+                elapsedTime = (Date.now() - startTime) / 1000;
 
                 // Check for cheating
                 if (elapsedTime < 10) {
                     alert('It looks like you\'re trying to cheat! Please try again.');
                     return;
                 } else {
-                    const book = document.getElementById('book-select').value;
-                    const chapter = document.getElementById('chapter-select').value;
-                    if (confirm('Your score for ' + book + ' ' + chapter +' is ' + Math.floor(elapsedTime) + ' seconds. Save score?') == true) {
-                        updateHighScore(book, chapter, elapsedTime);
-                    }
+                    document.getElementById('save-btn').removeAttribute("disabled"); // so you can click, 'save'
                 }
             } else {
                 startTime = Date.now();
@@ -147,6 +157,12 @@
                 running = true;
                 this.textContent = 'Stop';
             }
+        });
+
+        document.getElementById('save-btn').addEventListener('click', function() { //   gets the book and chapter, then updates the high score
+            const book = document.getElementById('book-select').value; //               Can be launched anytime, make sure it is disabled
+            const chapter = document.getElementById('chapter-select').value;
+            updateHighScore(book, chapter, elapsedTime);
         });
 
         // Function to update the timer display
