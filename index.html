@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cruising Timer</title>
     <style>
+        /* Basic styling for the body */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -17,25 +18,30 @@
             background-color: #f0f0f0;
         }
 
+        /* Styling for the main heading */
         h1 {
             margin-bottom: 20px;
         }
 
+        /* Styling for form elements and timer display */
         label, select, button, #timer-display, #high-scores {
             margin: 10px 0;
         }
 
+        /* Styling for select and button elements */
         select, button {
             font-size: 1.2em;
             padding: 10px;
             border-radius: 5px;
         }
 
+        /* Styling for the timer display */
         #timer-display {
             font-size: 2em;
             margin-top: 20px;
         }
 
+        /* Styling for the high scores section */
         #high-scores {
             width: 90%;
             max-width: 400px;
@@ -45,6 +51,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
+        /* Responsive styling for smaller screens */
         @media (max-width: 600px) {
             body {
                 padding: 20px;
@@ -85,7 +92,7 @@
     <div id="high-scores"></div>
 
     <script>
-
+        // Object containing the number of chapters for each book
         const chapters = {
             Romans: 16,
             James: 5,
@@ -93,6 +100,7 @@
             Everything: 1
         };
 
+        // Function to update chapter options based on selected book
         function updateChapterOptions() {
             const book = document.getElementById('book-select').value;
             const chapterSelect = document.getElementById('chapter-select');
@@ -105,6 +113,7 @@
             }
         }
 
+        // Event listener to update chapter options when book selection changes
         document.getElementById('book-select').addEventListener('change', updateChapterOptions);
         window.onload = updateChapterOptions;
 
@@ -112,15 +121,23 @@
         let startTime;
         let running = false;
 
+        // Event listener for start/stop button
         document.getElementById('start-stop-btn').addEventListener('click', function() {
             if (running) {
                 clearInterval(timer);
                 running = false;
                 this.textContent = 'Start';
                 const elapsedTime = (Date.now() - startTime) / 1000;
-                const book = document.getElementById('book-select').value;
-                const chapter = document.getElementById('chapter-select').value;
-                updateHighScore(book, chapter, elapsedTime);
+
+                // Check for cheating
+                if (elapsedTime < 30) {
+                    alert('It looks like you\'re trying to cheat! Please try again.');
+                    return;
+                } else {
+                    const book = document.getElementById('book-select').value;
+                    const chapter = document.getElementById('chapter-select').value;
+                    updateHighScore(book, chapter, elapsedTime);
+                }
             } else {
                 startTime = Date.now();
                 timer = setInterval(updateTimer, 100);
@@ -129,11 +146,13 @@
             }
         });
 
+        // Function to update the timer display
         function updateTimer() {
             const elapsedTime = (Date.now() - startTime) / 1000;
             document.getElementById('timer-display').textContent = elapsedTime.toFixed(2);
         }
 
+        // Function to update high scores
         function updateHighScore(book, chapter, time) {
             const highScores = getHighScores();
             const key = `${book}-${chapter}`;
@@ -144,6 +163,7 @@
             displayHighScores();
         }
 
+        // Function to get high scores from cookies
         function getHighScores() {
             const cookies = document.cookie.split('; ');
             const highScoreCookie = cookies.find(cookie => cookie.startsWith('highScores='));
@@ -154,6 +174,7 @@
             return {};
         }
 
+        // Function to display high scores
         function displayHighScores() {
             const highScores = getHighScores();
             const highScoresDiv = document.getElementById('high-scores');
@@ -164,6 +185,7 @@
             }
         }
 
+        // Function to delete a high score
         function deleteHighScore(key) {
             const highScores = getHighScores();
             delete highScores[key];
@@ -171,6 +193,7 @@
             displayHighScores();
         }
 
+        // Display high scores on page load
         window.onload = displayHighScores;
         updateChapterOptions(); // so that you can select a chapter without having to select James first
 
