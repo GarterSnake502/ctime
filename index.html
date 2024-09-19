@@ -136,7 +136,9 @@
                 } else {
                     const book = document.getElementById('book-select').value;
                     const chapter = document.getElementById('chapter-select').value;
-                    updateHighScore(book, chapter, elapsedTime);
+                    if (confirm("Your score for ${book} ${chapter} is ${elapsedTime}. Save score?") == true) {
+                        updateHighScore(book, chapter, elapsedTime);
+                    }
                 }
             } else {
                 startTime = Date.now();
