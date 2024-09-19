@@ -130,13 +130,13 @@
                 const elapsedTime = (Date.now() - startTime) / 1000;
 
                 // Check for cheating
-                if (elapsedTime < 30) {
+                if (elapsedTime < 10) {
                     alert('It looks like you\'re trying to cheat! Please try again.');
                     return;
                 } else {
                     const book = document.getElementById('book-select').value;
                     const chapter = document.getElementById('chapter-select').value;
-                    if (confirm("Your score for ${book} ${chapter} is ${elapsedTime}. Save score?") == true) {
+                    if (confirm('Your score for ' + book + ' ' + chapter +' is ' + Math.floor(elapsedTime) + ' seconds. Save score?') == true) {
                         updateHighScore(book, chapter, elapsedTime);
                     }
                 }
