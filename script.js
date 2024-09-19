@@ -12,7 +12,7 @@ const chapters = {
 };
 
 
-//          CHAPTER MANAGEMENT           //
+//          CHAPTER OPTIONS BUTTON           //
 
 
 // Function to update chapter options based on selected book
@@ -45,6 +45,9 @@ let running = false;
 
 let elapsedTime = 0; // only updates when you click STOP
 
+    //          TIMER BUTTONS          //
+
+
 // Event listener for start/stop button
 document.getElementById('start-stop-btn').addEventListener('click', function() {
 
@@ -66,6 +69,7 @@ document.getElementById('start-stop-btn').addEventListener('click', function() {
     }
 });
 
+// Even listener for Save Score button
 document.getElementById('save-btn').addEventListener('click', function() { //   gets the book and chapter, then updates the high score
     const book = document.getElementById('book-select').value; //               Can be launched anytime, make sure it is disabled
     const chapter = document.getElementById('chapter-select').value;
@@ -79,6 +83,11 @@ function updateTimer() {
     const elapsedTime = (Date.now() - startTime) / 1000;
     document.getElementById('timer-display').textContent = elapsedTime.toFixed(2);
 }
+
+
+
+//          HIGH SCORE MANAGEMENT           //
+
 
 // Function to update high scores
 function updateHighScore(book, chapter, time) {
@@ -122,7 +131,7 @@ function deleteHighScore(key) {
 }
 
 
-//          SAVEBUTTON          //
+//          SAVE BUTTON          //
 
 document.getElementById('chapter-select').addEventListener('change', disableSave); // prevent you from saving somewhere else
 
