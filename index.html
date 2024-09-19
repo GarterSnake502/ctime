@@ -55,8 +55,8 @@
             }
 
             select, button {
-                font-size: 1.5em;
-                padding: 15px;
+                font-size: 1em;
+                padding: 10px;
             }
 
             #timer-display {
@@ -75,6 +75,8 @@
     <select id="book-select">
         <option value="Romans">Romans</option>
         <option value="James">James</option>
+        <option value="Month">Month</option> <!-- for mass cruising -->
+        <option value="Everything">Everything</option>
     </select>
     <label for="chapter-select">Select Chapter:</label>
     <select id="chapter-select"></select>
@@ -86,7 +88,9 @@
 
         const chapters = {
             Romans: 16,
-            James: 5
+            James: 5,
+            Month: 7,
+            Everything: 1
         };
 
         function updateChapterOptions() {
@@ -143,6 +147,7 @@
         function getHighScores() {
             const cookies = document.cookie.split('; ');
             const highScoreCookie = cookies.find(cookie => cookie.startsWith('highScores='));
+
             if (highScoreCookie) {
                 return JSON.parse(highScoreCookie.split('=')[1]);
             }
@@ -155,7 +160,7 @@
             highScoresDiv.innerHTML = '<h2>High Scores</h2>';
             for (const key in highScores) {
                 const [book, chapter] = key.split('-');
-                highScoresDiv.innerHTML += `<p>${book} Chapter ${chapter}: <a href="#" onclick="deleteHighScore('${key}')">${highScores[key].toFixed(2)} seconds</a></p>`;
+                highScoresDiv.innerHTML += `<p>${book} ${chapter}: <a href="#" onclick="deleteHighScore('${key}')">${highScores[key].toFixed(2)} seconds</a></p>`;
             }
         }
 
