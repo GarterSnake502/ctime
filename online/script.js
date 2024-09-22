@@ -234,8 +234,9 @@ function changeUser() {
 document.getElementById('delete-time').addEventListener('click', function() {
     const book = document.getElementById('book-select').value;
     const chapter = document.getElementById('chapter-select').value;
-    deleteTime(username, book, chapter);
-    displayHighScores();
+    deleteTime(username, book, chapter).then(() => {
+        displayHighScores();
+    });
 });
 
 
