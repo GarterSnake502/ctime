@@ -1,4 +1,13 @@
 
+// this line initializes the user database so displayHighScores knows what to do. Don't move, or else the functions won't know what users is
+let users = []; // start empty, then add from save
+
+fetchUsers().then((data) => { // gets the latest user data from server
+    users = data.registeredUsers; // logs the users for debug
+    displayHighScores(); // displays the highscores for the current chapter
+});
+
+
 //          VARIABLES           //
 
 
@@ -94,6 +103,8 @@ function updateTimer() {
 // Function to update high scores
 function updateHighScore(book, chapter, time) {
 
+    document.getElementById('high-scores').innerHTML = '<h2>High Score</h2><div>loading...</div>'; // clear the highscores
+
     const key = `${username}-${book}-${chapter}`; // format
 
     getTime(username, book, chapter).then((score) => { // to await promise
@@ -111,11 +122,10 @@ function updateHighScore(book, chapter, time) {
                 submitTime(username, book, chapter, highscore, time); // just update the lastscore
             }
         }
+        displayHighScores(); // display the highscores--under then() so it is up to date
+
     }); // fetch current highscore and lastscore
 
-
-
-    displayHighScores(); // display the highscores
 }
 
 // Function to display high scores
@@ -128,25 +138,22 @@ function displayHighScores() {
 
     // clear the highscores
     const highScoresDiv = document.getElementById('high-scores');
-    highScoresDiv.innerHTML = '<h2>High Score</h2><br>loading...';
-    setTimeout(() => { // waits .2 seconds to give it time to fetch
-        highScoresDiv.innerHTML = '<h2>High Score </h2>';
-        const userScoresPromises = users.map(user => 
-            getTime(user, currentBook, currentChapter).then(userScores => ({ user, userScores }))
-        );
+    highScoresDiv.innerHTML = '<h2>High Score </h2>';
+    const userScoresPromises = users.map(user => 
+        getTime(user, currentBook, currentChapter).then(userScores => ({ user, userScores }))
+    );
 
-        Promise.all(userScoresPromises).then(userScoresArray => {
-            userScoresArray
-                .filter(({ userScores }) => userScores) // filter out users with no scores
-                .sort((a, b) => a.userScores.highscore - b.userScores.highscore) // sort by highscore
-                .forEach(({ user, userScores }) => {
-                    console.log(userScores); // log them for debug
-                    const highScoreDiv = document.createElement('div'); // then create user interface
-                    highScoreDiv.innerHTML = `<b>${user}</b> | high: ${userScores.highscore}&nbsp&nbsp&nbsplast: ${userScores.lastscore}`;
-                    highScoresDiv.appendChild(highScoreDiv);
-                });
-        });
-    }, 200);
+    Promise.all(userScoresPromises).then(userScoresArray => {
+        userScoresArray
+            .filter(({ userScores }) => userScores) // filter out users with no scores
+            .sort((a, b) => a.userScores.highscore - b.userScores.highscore) // sort by highscore
+            .forEach(({ user, userScores }) => {
+                console.log(userScores); // log them for debug
+                const highScoreDiv = document.createElement('div'); // then create user interface
+                highScoreDiv.innerHTML = `<b>${user}</b> | high: ${userScores.highscore}&nbsp&nbsp&nbsplast: ${userScores.lastscore}`;
+                highScoresDiv.appendChild(highScoreDiv);
+            });
+    });
 }
 
 
@@ -240,14 +247,5 @@ if (document.cookie == "") { // document.cookie is the username
 } else {
     username = document.cookie;
 }
-
-let users = []; // start empty, then add from save
-
-fetchUsers().then((data) => { // gets the latest user data from server
-    users = data.registeredUsers; // logs the users for debug
-    displayHighScores(); // displays the highscores for the current chapter
-});
-//export { users }; // to access from userManagement.js
-
 
 updateChapterOptions(); // so that you can select a chapter without having to select James first
