@@ -115,7 +115,26 @@ function displayHighScores() {
     const highScores = getHighScores();
     const highScoresDiv = document.getElementById('high-scores');
     highScoresDiv.innerHTML = '<h2>High Scores</h2>';
-    for (const key in highScores) {
+    const book = document.getElementById('book-select').value;
+    const chapter = document.getElementById('chapter-select').value;
+    const currentKey = `${book}-${chapter}`;
+
+    // Sort keys by book and chapter
+    const sortedKeys = Object.keys(highScores).sort((a, b) => {
+        const [bookA, chapterA] = a.split('-');
+        const [bookB, chapterB] = b.split('-');
+        if (bookA < bookB) return -1;
+        if (bookA > bookB) return 1;
+        return parseInt(chapterA) - parseInt(chapterB);
+    });
+
+    // Display the currently selected book and chapter at the top in bold
+    if (highScores[currentKey]) {
+        highScoresDiv.innerHTML += `<p><strong>${book} ${chapter}:</strong> <a href="#" onclick="deleteHighScore('${currentKey}')">${highScores[currentKey].toFixed(2)} seconds</p>`;
+    }
+
+    for (const key of sortedKeys) {
+        if (key === currentKey) continue; // Skip the current key as it's already displayed
         const [book, chapter] = key.split('-');
         highScoresDiv.innerHTML += `<p>${book} ${chapter}: <a href="#" onclick="deleteHighScore('${key}')">${highScores[key].toFixed(2)} seconds</a></p>`;
     }
@@ -132,7 +151,10 @@ function deleteHighScore(key) {
 
 //          SAVE BUTTON          //
 
-document.getElementById('chapter-select').addEventListener('change', disableSave); // prevent you from saving somewhere else
+document.getElementById('chapter-select').addEventListener('change', function() {
+    disableSave();
+    displayHighScores(); // to update bolded score at top
+}); // prevent you from saving somewhere else
 
 function disableSave() {
     document.getElementById('save-btn').setAttribute("disabled", "");
