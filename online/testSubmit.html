@@ -1,0 +1,28 @@
+<head>
+    <title>Test</title>
+</head>
+<body>
+    <h1>Test</h1>
+    <p>Test</p>
+    <script>
+        async function submitTime(vuser, vbook, vchapter, vhigh, vlast) { //  v's are so that you can enter "user, book, chapter" as the first three arguments
+            console.log(`Submitting to https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter} with data: ${vhigh}, ${vlast}`);
+            const url = `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`;
+            const data = { "highscore": vhigh, "lastscore": vlast };
+            
+            fetch(url, {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(data => console.log(data))
+            .catch((error) => {
+                console.log('SUBMISSION ERROR:', error);
+            });
+        }
+        submitTime("josiah", "Romans", "1", "1.00", "0.00");
+    </script>
+</body>

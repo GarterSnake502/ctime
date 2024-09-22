@@ -1,4 +1,5 @@
 
+
 // this line initializes the user database so displayHighScores knows what to do. Don't move, or else the functions won't know what users is
 let users = []; // start empty, then add from save
 
@@ -101,7 +102,7 @@ function updateTimer() {
 
 
 // Function to update high scores
-function updateHighScore(book, chapter, time) {
+async function updateHighScore(book, chapter, time) {
 
     document.getElementById('high-scores').innerHTML = '<h2>High Score</h2><div>loading...</div>'; // clear the highscores
 
@@ -113,17 +114,15 @@ function updateHighScore(book, chapter, time) {
             console.log('no highscore, creating a new one with the following variables: ', username, book, chapter, time, time);
             submitTime(username, book, chapter, time, time); // create one
         } else {
-            const highscore = score.highscore; // set some
-            const lastscore = score.lastscore; // variables
+            let highscore = score.highscore; // set some variables
     
             if (time < highscore) { // if your score is better
-                submitTime(username, book, chapter, time, time); // update the highscore and lastscore
-            } else {
-                submitTime(username, book, chapter, highscore, time); // just update the lastscore
+                highscore = time; // change the highscore to your new time
             }
-        }
-        displayHighScores(); // display the highscores--under then() so it is up to date
 
+            submitTime(username, book, chapter, highscore, time); // submit your new scores to the server--submitTime will automatically displayHighScores
+
+        }
     }); // fetch current highscore and lastscore
 
 }
@@ -179,13 +178,25 @@ function enableSave() {
 // IMPORTANT: THIS IS USING XHR, NOT FETCH API. YOU PROBABLY WANT TO CHANGE THAT NOW!!!!
 async function submitTime(vuser, vbook, vchapter, vhigh, vlast) { //  v's are so that you can enter "user, book, chapter" as the first three arguments
     console.log(`Submitting to https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter} with data: ${vhigh}, ${vlast}`);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({
-        highscore: vhigh,
-        lastscore: vlast
-    }));
+    const url = `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`;
+    const data = { highscore: vhigh, lastscore: vlast };
+    
+    fetch(url, {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.text()) // parsing as json throws error
+    .then(displayHighScores); // display the highscores--put here so that it only displays after the highscore is updated
+    // var xhr = new XMLHttpRequest();
+    // xhr.open("POST", `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`, true);
+    // xhr.setRequestHeader('Content-Type', 'application/json');
+    // xhr.send(JSON.stringify({
+    //     highscore: vhigh,
+    //     lastscore: vlast
+    // }));
     
 }
 
