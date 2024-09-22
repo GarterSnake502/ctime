@@ -1,11 +1,3 @@
-let username = document.cookie;
-
-if (document.cookie == "") { // document.cookie is the username
-    changeUser();
-}
-
-let users = ["josiah", "jackson", "olivia", "wyatt", "noah", "sammy"];
-
 
 //          VARIABLES           //
 
@@ -129,22 +121,32 @@ function updateHighScore(book, chapter, time) {
 // Function to display high scores
 function displayHighScores() {
 
+    console.log(`Displaying high scores for ${users}`); // log for debug
+
+    let currentBook = document.getElementById('book-select').value;
+    let currentChapter = document.getElementById('chapter-select').value;
+
     // clear the highscores
     const highScoresDiv = document.getElementById('high-scores');
     highScoresDiv.innerHTML = '<h2>High Score</h2><br>loading...';
-    setTimeout(() => { // waits one second to give it time to fetch
-        highScoresDiv.innerHTML = '<h2>High Score</h2>';
-        users.forEach(user => {
-            getTime(user, document.getElementById('book-select').value, document.getElementById('chapter-select').value).then((userScores) => { // fetch the highscores, then...
-                if (userScores) {
+    setTimeout(() => { // waits .2 seconds to give it time to fetch
+        highScoresDiv.innerHTML = '<h2>High Score </h2>';
+        const userScoresPromises = users.map(user => 
+            getTime(user, currentBook, currentChapter).then(userScores => ({ user, userScores }))
+        );
+
+        Promise.all(userScoresPromises).then(userScoresArray => {
+            userScoresArray
+                .filter(({ userScores }) => userScores) // filter out users with no scores
+                .sort((a, b) => a.userScores.highscore - b.userScores.highscore) // sort by highscore
+                .forEach(({ user, userScores }) => {
                     console.log(userScores); // log them for debug
                     const highScoreDiv = document.createElement('div'); // then create user interface
                     highScoreDiv.innerHTML = `<b>${user}</b> | high: ${userScores.highscore}&nbsp&nbsp&nbsplast: ${userScores.lastscore}`;
                     highScoresDiv.appendChild(highScoreDiv);
-                }
-            });
+                });
         });
-    }, 1000);
+    }, 200);
 }
 
 
@@ -199,6 +201,7 @@ async function getTime(user, book, chapter) { // IMPORTANT: will return promise,
 }
 
 function deleteTime(user, book, chapter) {
+    console.log(`Deleting from https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${user}-${book}-${chapter}`);
     fetch(`https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${user}-${book}-${chapter}`, {
         method: "DELETE"
     });
@@ -207,12 +210,44 @@ function deleteTime(user, book, chapter) {
 //          MISC          //
 function changeUser() {
     document.cookie = "";
-    username = prompt("Please enter your username:\n\nthe current options are:\njosiah\njackson\nolivia\nwyatt\nnoah\n\nsammy\nPlease don't choose anything else--doing so will glitch the database");
+    username = prompt("Enter your your name, no caps or spaces.\n\nPlease only do one username per person--my backend server can only hold so much, and each username adds about ~.1 seconds to the load speed of the high scores. Thanks!");
+    if (users.includes(username)) {
+        console.log(`Username changed to ${username}`);
+    } else {
+        console.log(`Username changed to ${username} and registered`);
+        registerNew(username);
+    }
     document.cookie = `${username}`;
+
+    fetchUsers().then((data) => function() {
+        users = data.registeredUsers;
+    }); // to refresh the users list
 }
 
+document.getElementById('delete-time').addEventListener('click', function() {
+    const book = document.getElementById('book-select').value;
+    const chapter = document.getElementById('chapter-select').value;
+    deleteTime(username, book, chapter);
+    displayHighScores();
+});
 
-// Display high scores on page load
-window.onload = displayHighScores;
+
+//          FETCH USER DATABASE          //
+
+let username = ""; // start empty, then add from cookie
+if (document.cookie == "") { // document.cookie is the username
+    changeUser();
+} else {
+    username = document.cookie;
+}
+
+let users = []; // start empty, then add from save
+
+fetchUsers().then((data) => { // gets the latest user data from server
+    users = data.registeredUsers; // logs the users for debug
+    displayHighScores(); // displays the highscores for the current chapter
+});
+//export { users }; // to access from userManagement.js
+
+
 updateChapterOptions(); // so that you can select a chapter without having to select James first
-deleteTime("the mule", "Month", 1); // delete a highscore
