@@ -176,7 +176,8 @@ function enableSave() {
 //          UPLOAD SCORES TO SERVER          //
 
 
-function submitTime(vuser, vbook, vchapter, vhigh, vlast) { //  v's are so that you can enter "user, book, chapter" as the first three arguments
+// IMPORTANT: THIS IS USING XHR, NOT FETCH API. YOU PROBABLY WANT TO CHANGE THAT NOW!!!!
+async function submitTime(vuser, vbook, vchapter, vhigh, vlast) { //  v's are so that you can enter "user, book, chapter" as the first three arguments
     console.log(`Submitting to https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter} with data: ${vhigh}, ${vlast}`);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`, true);
