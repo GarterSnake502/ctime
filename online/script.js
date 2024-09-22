@@ -176,14 +176,14 @@ function enableSave() {
 //          UPLOAD SCORES TO SERVER          //
 
 
-function submitTime(user, book, chapter, high, last) {
-    console.log(`Submitting to https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${user}-${book}-${chapter} with data: ${high}, ${last}`);
+function submitTime(vuser, vbook, vchapter, vhigh, vlast) { //  v's are so that you can enter "user, book, chapter" as the first three arguments
+    console.log(`Submitting to https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter} with data: ${vhigh}, ${vlast}`);
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${user}-${book}-${chapter}`, true);
+    xhr.open("POST", `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({
-        highscore: high,
-        lastscore: last
+        highscore: vhigh,
+        lastscore: vlast
     }));
     
 }
@@ -207,17 +207,27 @@ async function getTime(user, book, chapter) { // IMPORTANT: will return promise,
     }
 }
 
-function deleteTime(user, book, chapter) {
-    console.log(`Deleting from https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${user}-${book}-${chapter}`);
-    fetch(`https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${user}-${book}-${chapter}`, {
-        method: "DELETE"
-    });
+async function deleteTime(vuser, vbook, vchapter) { //  v's are so that you can enter "user, book, chapter" as the first three arguments without it defaulting
+    console.log(`Deleting from https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`);
+    try {
+        const response = await fetch(`https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`, {
+            method: "DELETE"
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
 }
 
 //          MISC          //
 function changeUser() {
     document.cookie = "";
     username = prompt("Enter your your name, no caps or spaces.\n\nPlease only do one username per person--my backend server can only hold so much, and each username adds about ~.1 seconds to the load speed of the high scores. Thanks!");
+    username = username.toLowerCase(); // to make sure it is lowercase
+    username = username.replace(/\s/g, ''); // to remove spaces
     if (users.includes(username)) {
         console.log(`Username changed to ${username}`);
     } else {
