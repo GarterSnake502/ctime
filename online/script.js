@@ -152,6 +152,7 @@ async function displayHighScores() {
                 highScoresDiv.appendChild(highScoreDiv);
             });
     });
+    alert("finished displaying high scores");
 }
 
 
