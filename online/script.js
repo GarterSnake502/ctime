@@ -193,7 +193,7 @@ async function submitTime(vuser, vbook, vchapter, vhigh, vlast) { //  v's are so
         await response.text();
         displayHighScores(); // display the highscores--put here so that it only displays after the highscore is updated
     } catch (error) {
-        console.error('Error submitting data:', error);
+        alert('Error submitting data:', error);
     }
 
 }
@@ -228,7 +228,7 @@ async function deleteTime(vuser, vbook, vchapter) { //  v's are so that you can 
         }
         return response;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        alert('Error removing data:', error);
     }
 }
 
