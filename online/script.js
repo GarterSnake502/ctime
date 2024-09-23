@@ -244,7 +244,12 @@ function changeUser() {
         console.log(`Username changed to ${username} and registered`);
         registerNew(username);
     }
-    document.cookie = `${username}`;
+    let newCookie = document.cookie;
+    newCookie = newCookie.split(';'); // to edit first field "username"
+    newCookie[0] = username;
+    
+    let finalCookie = newCookie.join(';'); // convert it to a string
+    document.cookie = finalCookie;
 
     fetchUsers().then((data) => function() {
         users = data.registeredUsers;
