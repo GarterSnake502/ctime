@@ -1,5 +1,4 @@
 
-
 // this line initializes the user database so displayHighScores knows what to do. Don't move, or else the functions won't know what users is
 let users = []; // start empty, then add from save
 
@@ -128,7 +127,7 @@ async function updateHighScore(book, chapter, time) {
 }
 
 // Function to display high scores
-function displayHighScores() {
+async function displayHighScores() {
 
     console.log(`Displaying high scores for ${users}`); // log for debug
 
@@ -181,23 +180,22 @@ async function submitTime(vuser, vbook, vchapter, vhigh, vlast) { //  v's are so
     const url = `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`;
     const data = { highscore: vhigh, lastscore: vlast };
     
-    fetch(url, {
-        method: 'POST', 
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.text()) // parsing as json throws error
-    .then(displayHighScores); // display the highscores--put here so that it only displays after the highscore is updated
-    // var xhr = new XMLHttpRequest();
-    // xhr.open("POST", `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/${vuser}-${vbook}-${vchapter}`, true);
-    // xhr.setRequestHeader('Content-Type', 'application/json');
-    // xhr.send(JSON.stringify({
-    //     highscore: vhigh,
-    //     lastscore: vlast
-    // }));
-    
+    try {
+        const response = await fetch(url, { // variable for later--await makes it so that it doesn't display until POST is finished
+            method: 'POST', 
+            cahce: 'no-store', // to make sure it is the latest data
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+
+        await response.text();
+        displayHighScores(); // display the highscores--put here so that it only displays after the highscore is updated
+    } catch (error) {
+        console.error('Error submitting data:', error);
+    }
+
 }
 
 async function getTime(user, book, chapter) { // IMPORTANT: will return promise, must manage data outside of function with .then()
@@ -268,7 +266,10 @@ let username = ""; // start empty, then add from cookie
 if (document.cookie == "") { // document.cookie is the username
     changeUser();
 } else {
-    username = document.cookie;
+    username = document.cookie.split(';')[0]; // for data from Classic Mode
 }
+
+console.log(document.cookie)
+console.log(`Username: `+username); // log for debug
 
 updateChapterOptions(); // so that you can select a chapter without having to select James first
