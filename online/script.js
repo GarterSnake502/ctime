@@ -253,6 +253,7 @@ function changeUser() {
 }
 
 document.getElementById('delete-time').addEventListener('click', function() {
+    document.getElementById('high-scores').innerHTML = '<h2>High Score</h2><div>loading...</div>';
     const book = document.getElementById('book-select').value;
     const chapter = document.getElementById('chapter-select').value;
     deleteTime(username, book, chapter).then(() => {
