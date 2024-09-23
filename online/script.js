@@ -226,7 +226,8 @@ async function deleteTime(vuser, vbook, vchapter) { //  v's are so that you can 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response;
+        await response.text();
+        displayHighScores(); // display the highscores after you delete a time
     } catch (error) {
         alert('Error removing data:', error);
     }
@@ -247,7 +248,7 @@ function changeUser() {
     let newCookie = document.cookie;
     newCookie = newCookie.split(';'); // to edit first field "username"
     newCookie[0] = username;
-    
+
     let finalCookie = newCookie.join(';'); // convert it to a string
     document.cookie = finalCookie;
 
@@ -260,9 +261,7 @@ document.getElementById('delete-time').addEventListener('click', function() {
     document.getElementById('high-scores').innerHTML = '<h2>High Score</h2><div>loading...</div>';
     const book = document.getElementById('book-select').value;
     const chapter = document.getElementById('chapter-select').value;
-    deleteTime(username, book, chapter).then(() => {
-        displayHighScores();
-    });
+    deleteTime(username, book, chapter);
 });
 
 
