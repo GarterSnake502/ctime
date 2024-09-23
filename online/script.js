@@ -239,18 +239,23 @@ function changeUser() {
     username = prompt("Enter your your name, no caps or spaces.\n\nPlease only do one username per person--my backend server can only hold so much, and each username adds about ~.1 seconds to the load speed of the high scores. Thanks!");
     username = username.toLowerCase(); // to make sure it is lowercase
     username = username.replace(/\s/g, ''); // to remove spaces
-    if (users.includes(username)) {
-        console.log(`Username changed to ${username}`);
-    } else {
-        console.log(`Username changed to ${username} and registered`);
-        registerNew(username);
-    }
+
+    //          COOKIE MANAGEMENT          //
     let newCookie = document.cookie;
     newCookie = newCookie.split(';'); // to edit first field "username"
     newCookie[0] = username;
 
     let finalCookie = newCookie.join(';'); // convert it to a string
     document.cookie = finalCookie;
+
+
+    //          SERVER MANAGEMENT          //
+    if (users.includes(username)) {
+        console.log(`Username changed to ${username}`);
+    } else {
+        console.log(`Username changed to ${username} and registered`);
+        registerNew(username);
+    }
 
     fetchUsers().then((data) => function() {
         users = data.registeredUsers;
