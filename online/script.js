@@ -2,11 +2,6 @@
 // this line initializes the user database so displayHighScores knows what to do. Don't move, or else the functions won't know what users is
 let users = []; // start empty, then add from save
 
-fetchUsers().then((data) => { // gets the latest user data from server
-    users = data.registeredUsers; // logs the users for debug
-    displayHighScores(); // displays the highscores for the current chapter
-});
-
 
 //          VARIABLES           //
 
@@ -108,7 +103,6 @@ async function updateHighScore(book, chapter, time) {
     const key = `${username}-${book}-${chapter}`; // format
 
     getTime(username, book, chapter).then((score) => { // to await promise
-        console.log('Current highscore and lastscore: ', score); // log for debug
         if (!score) { // if there is no highscore
             console.log('no highscore, creating a new one with the following variables: ', username, book, chapter, time, time);
             submitTime(username, book, chapter, time, time); // create one
@@ -146,7 +140,6 @@ async function displayHighScores() {
             .filter(({ userScores }) => userScores) // filter out users with no scores
             .sort((a, b) => a.userScores.highscore - b.userScores.highscore) // sort by highscore
             .forEach(({ user, userScores }) => {
-                console.log(userScores); // log them for debug
                 const highScoreDiv = document.createElement('div'); // then create user interface
                 highScoreDiv.innerHTML = `<b>${user}</b> | high: ${userScores.highscore}&nbsp&nbsp&nbsplast: ${userScores.lastscore}`;
                 highScoresDiv.appendChild(highScoreDiv);
@@ -274,12 +267,9 @@ document.getElementById('delete-time').addEventListener('click', function() {
 
 let username = ""; // start empty, then add from cookie
 if (document.cookie == "") { // document.cookie is the username
-    changeUser();
+    fetchUsers().then(() => changeUser); // fetches users first so it doesn't overwrite database
 } else {
     username = document.cookie.split(';')[0]; // for data from Classic Mode
 }
-
-console.log(document.cookie)
-console.log(`Username: `+username); // log for debug
 
 updateChapterOptions(); // so that you can select a chapter without having to select James first
