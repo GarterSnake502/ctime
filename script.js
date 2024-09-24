@@ -94,7 +94,14 @@ function updateHighScore(book, chapter, time) {
     const key = `${book}-${chapter}`;
     if (!highScores[key] || time < highScores[key]) {
         highScores[key] = time;
+
+        let username = document.cookie.split(';')[0].split("=")[1]; // for online
+        if (username == "" || !username) {
+            username = "guest";
+        }
+
         document.cookie = `highScores=${JSON.stringify(highScores)}; path=/`;
+        console.log(`username=${username}; highScores=${JSON.stringify(highScores)}; path=/`);
     }
     displayHighScores();
 }
@@ -102,6 +109,7 @@ function updateHighScore(book, chapter, time) {
 // Function to get high scores from cookies
 function getHighScores() {
     const cookies = document.cookie.split('; ');
+    console.log(document.cookie);
     const highScoreCookie = cookies.find(cookie => cookie.startsWith('highScores='));
 
     if (highScoreCookie) {

@@ -2,7 +2,6 @@
 // this line initializes the user database so displayHighScores knows what to do. Don't move, or else the functions won't know what users is
 let users = []; // start empty, then add from save
 
-
 //          VARIABLES           //
 
 
@@ -38,7 +37,6 @@ document.getElementById('book-select').addEventListener('change', function() {
     updateChapterOptions();
     displayHighScores();
 });
-window.onload = updateChapterOptions;
 
 
 //          TIMER MANAGEMENT           //
@@ -228,17 +226,16 @@ async function deleteTime(vuser, vbook, vchapter) { //  v's are so that you can 
 
 //          MISC          //
 function changeUser() {
-    document.cookie = "";
     username = prompt("Enter your your name, no caps or spaces.\n\nPlease only do one username per person--my backend server can only hold so much, and each username adds about ~.1 seconds to the load speed of the high scores. Thanks!");
     username = username.toLowerCase(); // to make sure it is lowercase
     username = username.replace(/\s/g, ''); // to remove spaces
 
     //          COOKIE MANAGEMENT          //
     let newCookie = document.cookie;
-    newCookie = newCookie.split(';'); // to edit first field "username"
-    newCookie[0] = username;
+    newCookie = newCookie.split('; '); // to edit first field "username"
+    newCookie[0] = `username=${username}`; // change the username variable
 
-    let finalCookie = newCookie.join(';'); // convert it to a string
+    let finalCookie = newCookie.join('; '); // convert it to a string
     document.cookie = finalCookie;
 
 
@@ -262,14 +259,4 @@ document.getElementById('delete-time').addEventListener('click', function() {
     deleteTime(username, book, chapter);
 });
 
-
-//          FETCH USER DATABASE          //
-
-let username = ""; // start empty, then add from cookie
-if (document.cookie == "") { // document.cookie is the username
-    fetchUsers().then(() => changeUser); // fetches users first so it doesn't overwrite database
-} else {
-    username = document.cookie.split(';')[0]; // for data from Classic Mode
-}
-
-updateChapterOptions(); // so that you can select a chapter without having to select James first
+updateChapterOptions();

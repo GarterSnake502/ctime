@@ -1,4 +1,5 @@
 
+
 async function registerNew(user) {
     const url = `https://kvdb.io/U6KfLHiFT1VQ7HA3UK1v7W/users`;
     const data = {"registeredUsers": users.concat([user])};
@@ -40,7 +41,19 @@ async function fetchUsers() { // IMPORTANT: updates users rather than returning 
         const data = await response.json();
         users = data.registeredUsers; // update the active users array--do NOT do this when calling the function!!!
         displayHighScores();
+        return data;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 }
+
+//          FETCH USER DATABASE          //
+
+let username = document.cookie.split('; ')[0].split('=')[1]; // for online
+fetchUsers().then(() => function () {
+    if (!document.cookie || document.cookie == "" || username == "guest") {
+        changeUser();
+    } else {
+        username = document.cookie.split('; ')[0].split('=')[1]; // for data from Classic--get the first username=[user], and get after the =
+    }
+});
