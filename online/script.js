@@ -10,6 +10,7 @@ const chapters = {
     Romans: 16,
     James: 5,
     Month: 7,
+    Quotes: 7,
     Everything: 1
 };
 
@@ -258,5 +259,6 @@ document.getElementById('delete-time').addEventListener('click', function() {
     const chapter = document.getElementById('chapter-select').value;
     deleteTime(username, book, chapter);
 });
+
 
 updateChapterOptions();
